@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRYA — RAW • RARE • REAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,200;1,9..40,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --dark-grey: #1A1A1A;
+    --grey: #808080;
+    --off-white: #E8E8E8;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  /* Cursor */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--white); border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.12s ease;
+  }
+  /* Grain */
+  .grain {
+    position: fixed; inset: -200%; width: 400%; height: 400%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035; pointer-events: none; z-index: 9000;
+    animation: grain 8s steps(10) infinite;
+  }
+  @keyframes grain {
+    0%{transform:translate(0,0)} 10%{transform:translate(-5%,-5%)} 20%{transform:translate(-10%,5%)}
+    30%{transform:translate(5%,-10%)} 40%{transform:translate(-5%,15%)} 50%{transform:translate(-10%,5%)}
+    60%{transform:translate(15%,0)} 70%{transform:translate(0,10%)} 80%{transform:translate(-15%,0)}
+    90%{transform:translate(10%,5%)} 100%{transform:translate(5%,0)}
+  }
+  /* Loader */
+  #loader {
+    position: fixed; inset: 0; background: var(--black); z-index: 10000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+  #loader.gone { opacity: 0; visibility: hidden; }
+  .loader-word {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 18vw, 14rem);
+    letter-spacing: 0.15em;
+    animation: lp 1.8s ease-in-out infinite;
+  }
+  .loader-bar { width: 100px; height: 1px; background: #1a1a1a; margin-top: 2.5rem; overflow: hidden; }
+  .loader-fill { height: 100%; background: var(--white); width: 0; animation: lf 2.2s ease forwards; }
+  @keyframes lp { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  @keyframes lf { to { width: 100%; } }
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2.5rem 5vw;
+    mix-blend-mode: difference;
+  }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.3em; color: var(--white); text-decoration: none; }
+  .nav-tag { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--grey); }
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(38px); transition: opacity 1s ease, transform 1s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .d1 { transition-delay: 0.15s; } .d2 { transition-delay: 0.3s; }
+  .d3 { transition-delay: 0.45s; } .d4 { transition-delay: 0.6s; }
+  /* FadeIn keyframe */
+  @keyframes fi { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  /* Hero */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 10rem 5vw 6rem; text-align: center;
+  }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, #181818 0%, #000 70%); z-index: 0; }
+  .hero-vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 30%, #000 100%); z-index: 1; }
+  .hero-c { position: relative; z-index: 2; width: 100%; }
+  .h-eye { font-size: 0.58rem; letter-spacing: 0.55em; text-transform: uppercase; color: var(--grey); margin-bottom: 2rem; opacity: 0; animation: fi 1.2s ease 0.4s forwards; }
+  .h-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(7rem, 23vw, 21rem);
+    letter-spacing: 0.08em; line-height: 0.88;
+    display: block; color: var(--white);
+    opacity: 0; animation: brandIn 1.5s cubic-bezier(0.16,1,0.3,1) 0.2s forwards;
+    text-shadow: 0 0 120px rgba(255,255,255,0.04);
+  }
+  @keyframes brandIn {
+    from { opacity:0; transform: scaleY(1.08) translateY(25px); filter: blur(16px); }
+    to { opacity:1; transform: scaleY(1) translateY(0); filter: blur(0); }
+  }
+  .h-tag { font-size: clamp(0.58rem, 1.4vw, 0.72rem); letter-spacing: 0.55em; text-transform: uppercase; color: var(--grey); margin: 1.4rem 0 3.2rem; opacity: 0; animation: fi 1s ease 0.8s forwards; }
+  .h-tag span { margin: 0 0.4em; }
+  .h-div { width: 1px; height: 55px; background: linear-gradient(to bottom, transparent, var(--grey), transparent); margin: 0 auto 3.2rem; opacity: 0; animation: fi 1s ease 1s forwards; }
+  .h-quote { font-size: clamp(1rem, 2.4vw, 1.3rem); font-weight: 200; letter-spacing: 0.05em; color: var(--white); max-width: 580px; margin: 0 auto 1.2rem; opacity: 0; animation: fi 1s ease 1.2s forwards; line-height: 1.55; }
+  .h-sub { font-size: clamp(0.65rem, 1.3vw, 0.8rem); letter-spacing: 0.35em; text-transform: uppercase; color: var(--grey); margin-bottom: 3.5rem; opacity: 0; animation: fi 1s ease 1.4s forwards; }
+  /* Countdown */
+  .cd-wrap { opacity: 0; animation: fi 1s ease 1.65s forwards; }
+  .cd { display: flex; gap: clamp(1.2rem, 4vw, 4rem); justify-content: center; align-items: flex-end; margin-bottom: 1rem; }
+  .cd-u { text-align: center; }
+  .cd-n { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.2rem, 8vw, 7rem); line-height: 1; letter-spacing: 0.04em; display: block; min-width: 2ch; }
+  .cd-l { font-size: 0.52rem; letter-spacing: 0.42em; text-transform: uppercase; color: var(--grey); margin-top: 0.35rem; display: block; }
+  .cd-sep { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 5vw, 4rem); color: var(--dark-grey); padding-bottom: 0.5rem; }
+  .drop-tag { font-size: 0.58rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--grey); margin-top: 1.5rem; border: 1px solid #222; display: inline-block; padding: 0.6em 2em; }
+  /* Email */
+  .ef-wrap { margin-top: 3.5rem; opacity: 0; animation: fi 1s ease 1.9s forwards; }
+  .ef { display: flex; max-width: 460px; margin: 0 auto; border: 1px solid #2a2a2a; overflow: hidden; }
+  .ef input { flex: 1; background: transparent; border: none; outline: none; padding: 1.1rem 1.4rem; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.12em; font-weight: 300; }
+  .ef input::placeholder { color: #383838; }
+  .ef button { background: var(--white); color: var(--black); border: none; padding: 1.1rem 1.6rem; font-family: 'DM Sans', sans-serif; font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; cursor: none; white-space: nowrap; transition: background 0.3s; }
+  .ef button:hover { background: var(--off-white); }
+  .ef-ok { display: none; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--white); margin-top: 1.2rem; border: 1px solid #2a2a2a; padding: 1rem 2rem; max-width: 460px; margin-left: auto; margin-right: auto; }
+  /* Scroll cue */
+  .sc { position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; z-index: 2; opacity: 0; animation: fi 1s ease 2.4s forwards; }
+  .sc span { font-size: 0.5rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--grey); }
+  .sc-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--grey), transparent); animation: sp 2.2s ease-in-out infinite; }
+  @keyframes sp { 0%,100%{opacity:1;transform:scaleY(1)} 50%{opacity:0.25;transform:scaleY(0.5)} }
+  /* Sections */
+  section { padding: clamp(6rem, 12vw, 11rem) 5vw; }
+  .s-label { font-size: 0.53rem; letter-spacing: 0.6em; text-transform: uppercase; color: var(--grey); display: block; margin-bottom: 5rem; }
+  /* About */
+  #about { background: var(--dark-grey); }
+  .ab-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+  .ab-text { font-size: clamp(1.1rem, 2.6vw, 1.6rem); font-weight: 200; line-height: 2; color: var(--white); letter-spacing: 0.04em; }
+  .ab-text em { font-style: italic; font-family: 'Playfair Display', Georgia, serif; font-weight: 400; }
+  .ab-tag { font-size: 0.62rem; letter-spacing: 0.55em; text-transform: uppercase; color: var(--grey); margin-top: 3.5rem; }
+  /* Products */
+  #products { background: var(--black); }
+  .pr-hd { text-align: center; margin-bottom: 5rem; }
+  .pr-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 7vw, 6rem); letter-spacing: 0.12em; display: block; margin-bottom: 1.5rem; }
+  .pr-sub { font-size: clamp(0.65rem, 1.2vw, 0.8rem); letter-spacing: 0.38em; text-transform: uppercase; color: var(--grey); }
+  .pr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; background: #0e0e0e; border: 1px solid #0e0e0e; max-width: 1200px; margin: 0 auto; }
+  .pr-card { background: var(--black); padding: 3.5rem 2.5rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 230px; transition: background 0.5s; position: relative; overflow: hidden; }
+  .pr-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--grey), transparent); opacity: 0; transition: opacity 0.5s; }
+  .pr-card:hover { background: var(--dark-grey); }
+  .pr-card:hover::after { opacity: 1; }
+  .pr-num { font-size: 0.58rem; letter-spacing: 0.4em; color: #2a2a2a; }
+  .pr-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.7rem, 2.8vw, 2.4rem); letter-spacing: 0.12em; display: block; margin: 1.5rem 0 0.7rem; transition: letter-spacing 0.4s; }
+  .pr-card:hover .pr-name { letter-spacing: 0.2em; }
+  .pr-soon { font-size: 0.52rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--grey); }
+  /* Philosophy */
+  #philosophy { background: var(--white); color: var(--black); text-align: center; }
+  .ph-big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 6vw, 5.5rem); letter-spacing: 0.06em; line-height: 1.05; color: var(--black); max-width: 880px; margin: 0 auto 3rem; }
+  .ph-sm { font-size: clamp(0.82rem, 1.4vw, 0.95rem); color: var(--grey); letter-spacing: 0.28em; line-height: 2.4; font-weight: 200; }
+  /* Social */
+  #social { background: var(--dark-grey); text-align: center; }
+  .so-pre { font-size: clamp(0.65rem, 1.2vw, 0.78rem); letter-spacing: 0.42em; text-transform: uppercase; color: var(--grey); margin-bottom: 3rem; }
+  .so-links { display: flex; justify-content: center; gap: clamp(2rem, 6vw, 5rem); flex-wrap: wrap; }
+  .so-link { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.4rem, 3vw, 2.2rem); letter-spacing: 0.2em; color: var(--white); text-decoration: none; position: relative; transition: color 0.3s; }
+  .so-link::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px; background: var(--white); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .so-link:hover::after { transform: scaleX(1); }
+  /* CTA */
+  #cta { background: var(--black); text-align: center; }
+  .cta-dt { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 14vw, 13rem); letter-spacing: 0.05em; line-height: 0.92; display: block; }
+  .cta-rdy { font-size: clamp(0.65rem, 1.4vw, 0.88rem); letter-spacing: 0.55em; text-transform: uppercase; color: var(--grey); margin: 1.5rem 0 5rem; }
+  /* Footer */
+  footer { background: var(--black); border-top: 1px solid #141414; padding: 5rem 5vw 3rem; display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 3rem; }
+  .ft-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; letter-spacing: 0.3em; }
+  .ft-tag { font-size: 0.52rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--grey); margin-top: 0.5rem; }
+  .ft-mid { text-align: center; }
+  .ft-mail { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--grey); text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.3s; }
+  .ft-mail:hover { color: var(--white); }
+  .ft-copy { font-size: 0.52rem; letter-spacing: 0.25em; color: #2a2a2a; text-align: right; align-self: end; }
+  /* Responsive */
+  @media (max-width: 700px) { footer { grid-template-columns: 1fr; text-align: center; } .ft-mid { order: -1; } .ft-copy { text-align: center; } }
+  @media (max-width: 480px) { .ef { flex-direction: column; } .ef button { padding: 0.9rem; } .cd { gap: 0.8rem; } }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cring"></div>
+<div class="grain"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-word">IRYA</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">IRYA</a>
+  <span class="nav-tag">First Drop — Aug 15, 2026</span>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-vig"></div>
+  <div class="hero-c">
+    <p class="h-eye">Coming Soon &nbsp;/&nbsp; 2026</p>
+    <span class="h-brand">IRYA</span>
+    <p class="h-tag"><span>RAW</span><span>•</span><span>RARE</span><span>•</span><span>REAL</span></p>
+    <div class="h-div"></div>
+    <p class="h-quote">"Power doesn't ask for attention.<br>It commands it."</p>
+    <p class="h-sub">A new identity arrives soon.</p>
+
+    <div class="cd-wrap">
+      <div class="cd">
+        <div class="cd-u"><span class="cd-n" id="d">000</span><span class="cd-l">Days</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="h">00</span><span class="cd-l">Hours</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="m">00</span><span class="cd-l">Minutes</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-u"><span class="cd-n" id="s">00</span><span class="cd-l">Seconds</span></div>
+      </div>
+      <span class="drop-tag">FIRST DROP — AUGUST 15</span>
+    </div>
+
+    <div class="ef-wrap">
+      <div class="ef" id="hf">
+        <input type="email" id="he" placeholder="Enter your email" autocomplete="off">
+        <button onclick="join('he','hs','hf')">Join The Inner Circle</button>
+      </div>
+      <div class="ef-ok" id="hs">You are now part of the IRYA Inner Circle.</div>
+    </div>
+  </div>
+  <div class="sc"><span>Scroll</span><div class="sc-line"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <span class="s-label reveal">01 — Identity</span>
+  <div class="ab-inner">
+    <p class="ab-text reveal">
+      IRYA is not just <em>clothing.</em> It is a signal.<br><br>
+      A signal for those who refuse the ordinary.<br><br>
+      Built with rare fabrics, minimal design,<br>
+      and uncompromising identity.<br><br>
+      No mass production. No noise. No trends.<br><br>
+      <em>Just presence.</em>
+    </p>
+    <p class="ab-tag reveal d2">RAW &nbsp;•&nbsp; RARE &nbsp;•&nbsp; REAL</p>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="pr-hd">
+    <span class="s-label reveal">02 — Collection</span>
+    <span class="pr-title reveal">"The First Collection"</span>
+    <p class="pr-sub reveal d1">Crafted for those who move differently.</p>
+  </div>
+  <div class="pr-grid">
+    <div class="pr-card reveal"><span class="pr-num">001</span><div><span class="pr-name">T-Shirts</span><span class="pr-soon">Coming Aug 15</span></div></div>
+    <div class="pr-card reveal d1"><span class="pr-num">002</span><div><span class="pr-name">Caps</span><span class="pr-soon">Coming Aug 15</span></div></div>
+    <div class="pr-card reveal d2"><span class="pr-num">003</span><div><span class="pr-name">Pants</span><span class="pr-soon">Coming Aug 15</span></div></div>
+    <div class="pr-card reveal"><span class="pr-num">004</span><div><span class="pr-name">Perfumes</span><span class="pr-soon">Coming Aug 15</span></div></div>
+    <div class="pr-card reveal d1"><span class="pr-num">005</span><div><span class="pr-name">Belts</span><span class="pr-soon">Coming Aug 15</span></div></div>
+    <div class="pr-card reveal d2"><span class="pr-num">006</span><div><span class="pr-name">Lifestyle Essentials</span><span class="pr-soon">Coming Aug 15</span></div></div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section id="philosophy">
+  <span class="s-label reveal" style="color:#999">03 — Philosophy</span>
+  <p class="ph-big reveal">"Not everyone is meant to wear IRYA."</p>
+  <p class="ph-sm reveal d1">Black. White. Grey.<br>Power doesn't need color.</p>
+</section>
+
+<!-- SOCIAL -->
+<section id="social">
+  <span class="s-label reveal">04 — The Movement</span>
+  <p class="so-pre reveal">"The movement begins before the launch."</p>
+  <div class="so-links reveal d1">
+    <a href="#" class="so-link">Instagram</a>
+    <a href="#" class="so-link">TikTok</a>
+    <a href="#" class="so-link">YouTube</a>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <span class="s-label reveal">05 — The Drop</span>
+  <span class="cta-dt reveal">August<br>15.</span>
+  <p class="cta-rdy reveal d1">Be ready.</p>
+  <div style="opacity:1">
+    <div class="ef reveal d2" id="cf">
+      <input type="email" id="ce" placeholder="Enter your email" autocomplete="off">
+      <button onclick="join('ce','cs','cf')">Join The Inner Circle</button>
+    </div>
+    <div class="ef-ok" id="cs">You are now part of the IRYA Inner Circle.</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div><div class="ft-logo">IRYA</div><p class="ft-tag">RAW &nbsp;•&nbsp; RARE &nbsp;•&nbsp; REAL</p></div>
+  <div class="ft-mid"><a href="mailto:contact@irya.com" class="ft-mail">contact@irya.com</a></div>
+  <div class="ft-copy">© IRYA 2026. All rights reserved.</div>
+</footer>
+
+<script>
+  // Loader
+  window.addEventListener('load', () => setTimeout(() => document.getElementById('loader').classList.add('gone'), 2400));
+
+  // Cursor
+  const cur = document.getElementById('cursor'), ring = document.getElementById('cring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+  (function tick() { cur.style.left=mx+'px'; cur.style.top=my+'px'; rx+=(mx-rx)*0.11; ry+=(my-ry)*0.11; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(tick); })();
+
+  // Countdown
+  function cd() {
+    const t = new Date('2026-08-15T00:00:00').getTime(), n = Date.now(), diff = t - n;
+    if (diff <= 0) return;
+    document.getElementById('d').textContent = String(Math.floor(diff/86400000)).padStart(3,'0');
+    document.getElementById('h').textContent = String(Math.floor(diff%86400000/3600000)).padStart(2,'0');
+    document.getElementById('m').textContent = String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+    document.getElementById('s').textContent = String(Math.floor(diff%60000/1000)).padStart(2,'0');
+  }
+  cd(); setInterval(cd, 1000);
+
+  // Form
+  function join(inp, ok, form) {
+    const v = document.getElementById(inp).value.trim();
+    if (!v || !v.includes('@')) return;
+    document.getElementById(form).style.display = 'none';
+    document.getElementById(ok).style.display = 'block';
+  }
+  ['he','ce'].forEach(id => document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') e.target.closest('.ef').querySelector('button').click();
+  }));
+
+  // Reveal
+  const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold: 0.13});
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
